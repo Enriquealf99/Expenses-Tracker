@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Monthly Report for {{ current_user.username }}</h1>
+    <ul>
+        {% for month, total in monthly_expenses %}
+            <li>Month: {{ month }} - Total: ${{ total }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Expenses Details</h2>
+    <ul>
+        {% for expense in expenses %}
+            <li>{{ expense.date }}: {{ expense.category.name }} - ${{ expense.amount }} <br> Description: {{ expense.description }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

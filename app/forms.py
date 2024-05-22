@@ -35,4 +35,17 @@ class ExpenseForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(ExpenseForm, self).__init__(*args, **kwargs)
+        categories = Category.query.filter_by(user_id=current_user.id).all()
+        print("Categories:", categories)  # Debugging line
+        self.category.choices = [(c.id, c.name) for c in categories]
+
+class EditExpenseForm(FlaskForm):
+    amount = FloatField('Amount', validators=[DataRequired()])
+    category = SelectField('Category', validators=[DataRequired()], coerce=int)
+    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+    description = TextAreaField('Description')
+    submit = SubmitField('Update Expense')
+
+    def __init__(self, *args, **kwargs):
+        super(EditExpenseForm, self).__init__(*args, **kwargs)
         self.category.choices = [(c.id, c.name) for c in Category.query.filter_by(user_id=current_user.id).all()]
