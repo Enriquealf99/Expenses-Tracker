@@ -1,23 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Monthly Report</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <h1>Monthly Report for {{ current_user.username }}</h1>
-    <ul>
-        {% for month, total in monthly_expenses %}
-            <li>Month: {{ month }} - Total: ${{ total }}</li>
-        {% endfor %}
-    </ul>
-    <h2>Expenses Details</h2>
-    <ul>
-        {% for expense in expenses %}
-            <li>{{ expense.date }}: {{ expense.category.name }} - ${{ expense.amount }} <br> Description: {{ expense.description }}</li>
-        {% endfor %}
-    </ul>
+{% extends "base.html" %}
+{% block title %}Monthly Report{% endblock %}
+{% block content %}
+    <h2>Monthly Report</h2>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.month.label }}<br>
+            {{ form.month() }}<br>
+            {% for error in form.month.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.year.label }}<br>
+            {{ form.year() }}<br>
+            {% for error in form.year.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    {% if expenses %}
+        <h3>Expenses for {{ form.month.choices[form.month.data|int - 1][1] }} {{ form.year.data }}</h3>
+        <ul>
+            {% for expense in expenses %}
+                <li>Total: ${{ expense.total }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <a href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
-</body>
-</html>
+{% endblock %}

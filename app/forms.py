@@ -1,6 +1,7 @@
+import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, DateField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from app.models import User, Category
 from flask_login import current_user
 
@@ -49,3 +50,18 @@ class EditExpenseForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(EditExpenseForm, self).__init__(*args, **kwargs)
         self.category.choices = [(c.id, c.name) for c in Category.query.filter_by(user_id=current_user.id).all()]
+
+class MonthYearForm(FlaskForm):
+    current_year = datetime.datetime.now().year
+    months = [(i, datetime.date(2000, i, 1).strftime('%B')) for i in range(1, 13)]
+    years = [(i, i) for i in range(current_year - 50, current_year + 1)]
+
+    month = SelectField('Month', choices=months, validators=[DataRequired()])
+    year = SelectField('Year', choices=years, validators=[DataRequired()])
+    submit = SubmitField('Generate Report')
+
+
+class UpdateProfileForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=100)])
+    submit = SubmitField('Update Profile')

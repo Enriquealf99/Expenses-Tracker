@@ -36,3 +36,11 @@ nav a {
     background-color: #f44336;
     color: white;
 }
+
+.chart-container {
+    position: relative;
+    height: 40vh;
+    width: 80vw;
+    margin: auto;
+}
+

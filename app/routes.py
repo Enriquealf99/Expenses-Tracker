@@ -5,6 +5,9 @@ from app import db
 from app.models import User, Expense, Category
 from app.forms import EditExpenseForm, RegistrationForm, LoginForm, ExpenseForm
 from flask_login import login_user, current_user, logout_user, login_required
+from app.forms import MonthYearForm
+from app.forms import UpdateProfileForm
+from app.models import User, Expense
 
 bp = Blueprint('main', __name__)
 
@@ -45,11 +48,15 @@ def logout():
     logout_user()
     return redirect(url_for('main.index'))
 
+
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.asc()).all()
-    return render_template('dashboard.html', expenses=expenses)
+    expenses = Expense.query.filter_by(user_id=current_user.id).all()
+    labels = [expense.date.strftime('%Y-%m-%d') for expense in expenses]
+    data = [expense.amount for expense in expenses]
+    return render_template('dashboard.html', expenses=expenses, labels=labels, data=data)
+
 
 @bp.route('/add_expense', methods=['GET', 'POST'])
 @login_required
@@ -102,16 +109,25 @@ def delete_expense(expense_id):
 
 
 
-@bp.route('/reports/monthly')
+@bp.route('/monthly_report', methods=['GET', 'POST'])
 @login_required
 def monthly_report():
-    current_year = datetime.now().year
-    expenses = Expense.query.filter_by(user_id=current_user.id).filter(extract('year', Expense.date) == current_year).order_by(Expense.date).all()
-    monthly_expenses = db.session.query(
-        extract('month', Expense.date).label('month'),
-        func.sum(Expense.amount).label('total')
-    ).filter_by(user_id=current_user.id).filter(extract('year', Expense.date) == current_year).group_by('month').all()
-    return render_template('monthly_report.html', expenses=expenses, monthly_expenses=monthly_expenses)
+    form = MonthYearForm()
+    expenses = []
+    if form.validate_on_submit():
+        month = form.month.data
+        year = form.year.data
+        expenses = db.session.query(
+            func.sum(Expense.amount).label('total')
+        ).filter(
+            extract('month', Expense.date) == month,
+            extract('year', Expense.date) == year,
+            Expense.user_id == current_user.id
+        ).all()
+        print(f"Month: {month}, Year: {year}, Expenses: {expenses}")  # Debugging line
+    return render_template('monthly_report.html', form=form, expenses=expenses)
+
+
 
 @bp.route('/reports/yearly')
 @login_required
@@ -122,6 +138,22 @@ def yearly_report():
         func.sum(Expense.amount).label('total')
     ).filter_by(user_id=current_user.id).group_by('year').all()
     return render_template('yearly_report.html', expenses=expenses, yearly_expenses=yearly_expenses)
+
+
+@bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = UpdateProfileForm()
+    if form.validate_on_submit():
+        current_user.email = form.email.data
+        current_user.set_password(form.password.data)
+        db.session.commit()
+        flash('Profile updated successfully', 'success')
+        return redirect(url_for('main.profile'))
+    elif request.method == 'GET':
+        form.email.data = current_user.email
+    return render_template('profile.html', form=form)
+
 
 
 
