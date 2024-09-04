@@ -55,10 +55,15 @@ def logout():
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    expenses = Expense.query.filter_by(user_id=current_user.id).all()
+    # Get all expenses for the current user, ordered by date
+    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date).all()
+
+    # Prepare labels and data for the chart
     labels = [expense.date.strftime('%Y-%m-%d') for expense in expenses]
     data = [expense.amount for expense in expenses]
+
     return render_template('dashboard.html', expenses=expenses, labels=labels, data=data)
+
 
 
 @bp.route('/add_expense', methods=['GET', 'POST'])
