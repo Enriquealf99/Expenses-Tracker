@@ -1,6 +1,6 @@
-import os
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
+    SECRET_KEY = 'aD8K#3f!9S*5xYp1@6gL2w$hXnV4zQmP'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1017@localhost:5433/expenses_tracker'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+

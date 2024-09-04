@@ -1,23 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Yearly Report</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <h1>Yearly Report for {{ current_user.username }}</h1>
-    <ul>
-        {% for year, total in yearly_expenses %}
-            <li>Year: {{ year }} - Total: ${{ total }}</li>
-        {% endfor %}
-    </ul>
-    <h2>Expenses Details</h2>
-    <ul>
-        {% for expense in expenses %}
-            <li>{{ expense.date }}: {{ expense.category.name }} - ${{ expense.amount }} <br> Description: {{ expense.description }}</li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Yearly Report{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Yearly Report</h1>
+        
+        <div class="yearly-report">
+            <h2>Total Expenses by Year</h2>
+            <ul class="yearly-totals">
+                {% for year, total in yearly_expenses %}
+                    <li><strong>Year:</strong> {{ year }} - <strong>Total:</strong> ${{ total }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="expense-details">
+            <h2>Expenses Details</h2>
+            <ul class="expenses-list">
+                {% for expense in expenses %}
+                    <li>
+                        <div class="expense-date">{{ expense.date }}</div>
+                        <div class="expense-category">{{ expense.category.name }}</div>
+                        <div class="expense-amount">$ {{ expense.amount }}</div>
+                        <div class="expense-description">{{ expense.description }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <a class="btn btn-primary" href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+    </div>
+{% endblock %}

@@ -7,7 +7,8 @@ from app.forms import EditExpenseForm, RegistrationForm, LoginForm, ExpenseForm
 from flask_login import login_user, current_user, logout_user, login_required
 from app.forms import MonthYearForm
 from app.forms import UpdateProfileForm
-from app.models import User, Expense
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 bp = Blueprint('main', __name__)
 
@@ -22,7 +23,8 @@ def register():
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        hashed_password = generate_password_hash(form.password.data)  # Hash the password
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created!', 'success')
@@ -36,12 +38,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.password == form.password.data:
+        if user and check_password_hash(user.password, form.password.data):  # Secure password check
             login_user(user, remember=True)
             return redirect(url_for('main.dashboard'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', form=form)
+
 
 @bp.route('/logout')
 def logout():
@@ -62,10 +65,11 @@ def dashboard():
 @login_required
 def add_expense():
     form = ExpenseForm()
+
     if form.validate_on_submit():
         expense = Expense(
             amount=form.amount.data,
-            category_id=form.category.data,
+            category_id=form.category.data,  # Store the selected category ID
             date=form.date.data,
             description=form.description.data,
             user_id=current_user.id
@@ -74,7 +78,9 @@ def add_expense():
         db.session.commit()
         flash('Expense added successfully!', 'success')
         return redirect(url_for('main.dashboard'))
+
     return render_template('add_expense.html', form=form)
+
 
 @bp.route('/list_categories')
 @login_required
@@ -132,12 +138,13 @@ def monthly_report():
 @bp.route('/reports/yearly')
 @login_required
 def yearly_report():
-    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date).all()
     yearly_expenses = db.session.query(
         extract('year', Expense.date).label('year'),
         func.sum(Expense.amount).label('total')
-    ).filter_by(user_id=current_user.id).group_by('year').all()
-    return render_template('yearly_report.html', expenses=expenses, yearly_expenses=yearly_expenses)
+    ).filter(Expense.user_id == current_user.id).group_by(extract('year', Expense.date)).all()
+
+    return render_template('yearly_report.html', yearly_expenses=yearly_expenses)
+
 
 
 @bp.route('/profile', methods=['GET', 'POST'])
@@ -149,10 +156,13 @@ def profile():
         current_user.set_password(form.password.data)
         db.session.commit()
         flash('Profile updated successfully', 'success')
-        return redirect(url_for('main.profile'))
+        return redirect(url_for('main.dashboard'))  # Redirect to dashboard after profile update
     elif request.method == 'GET':
         form.email.data = current_user.email
     return render_template('profile.html', form=form)
+
+
+
 
 
 

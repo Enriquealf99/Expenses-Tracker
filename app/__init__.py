@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager
 from flask_migrate import Migrate
 from config import Config
 
@@ -16,14 +16,16 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     migrate.init_app(app, db)
 
-    from app import routes
-    app.register_blueprint(routes.bp)
+    # Import the models after app, db, and extensions are initialized
+    from app.models import User, Expense, Category  # Delayed import to avoid circular dependencies
+
+    from app.routes import bp as routes_bp
+    app.register_blueprint(routes_bp)
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Error handling
     @app.errorhandler(500)
     def internal_error(error):
         db.session.rollback()
@@ -35,8 +37,5 @@ def create_app(config_class=Config):
 
     return app
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
+
+

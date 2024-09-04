@@ -1,46 +1,246 @@
-body {
-    font-family: Arial, sans-serif;
+/* General Reset */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
 }
 
-nav {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-    text-align: center;
+body {
+    background-color: #f4f7f9;
+    color: #333;
+    line-height: 1.6;
 }
 
-nav a {
+/* Container */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: #007bff;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .logo {
     color: white;
-    margin: 0 1rem;
+    font-size: 24px;
+    font-weight: bold;
     text-decoration: none;
 }
 
-.container {
-    padding: 2rem;
+.navbar .nav-links {
+    display: flex;
+    gap: 20px;
 }
 
+.navbar .nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar .nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Aligning the logout link to the far right */
+.navbar .logout-link {
+    margin-left: auto;
+}
+
+/* Ensure proper spacing for logout */
+.navbar .nav-links a:last-child {
+    margin-left: 20px;
+}
+
+/* Responsive Navigation */
+@media (max-width: 768px) {
+    .navbar .nav-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .navbar .nav-links a {
+        padding: 10px;
+        text-align: center;
+    }
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: #28a745;
+}
+
+.btn-secondary {
+    background-color: #ffc107;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* Content Area */
+.content {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Flash Messages */
 .flash {
-    padding: 1rem;
-    margin: 1rem 0;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
 }
 
 .flash.success {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #d4edda;
+    color: #155724;
 }
 
-.flash.danger {
-    background-color: #f44336;
+.flash.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.flash.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Headings */
+h1, h2 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+/* Yearly Totals */
+.yearly-totals {
+    list-style-type: none;
+    padding: 0;
+}
+
+.yearly-totals li {
+    background-color: #f4f6f9;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+/* Expense Details */
+.expenses-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.expenses-list li {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid #007bff;
+    border-radius: 5px;
+}
+
+.expenses-list li .expense-date {
+    font-weight: bold;
+    color: #555;
+}
+
+.expenses-list li .expense-category {
+    font-weight: bold;
+    margin-top: 5px;
+    color: #333;
+}
+
+.expenses-list li .expense-amount {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.expenses-list li .expense-description {
+    margin-top: 10px;
+    font-style: italic;
+    color: #666;
+}
+
+/* Specific Button Styling */
+.btn {
+    background-color: #007bff;
     color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Dashboard styling */
+.dashboard-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .chart-container {
     position: relative;
-    height: 40vh;
-    width: 80vw;
-    margin: auto;
+    height: 60vh;
+    width: 100%;
+    margin: 0 auto;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 28px;
+    text-align: center;
 }
 

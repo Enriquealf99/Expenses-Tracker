@@ -29,16 +29,17 @@ class LoginForm(FlaskForm):
 
 class ExpenseForm(FlaskForm):
     amount = FloatField('Amount', validators=[DataRequired()])
-    category = SelectField('Category', validators=[DataRequired()], coerce=int)
+    category = SelectField('Category', coerce=int, validators=[DataRequired()])
     date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
     description = TextAreaField('Description')
     submit = SubmitField('Add Expense')
 
     def __init__(self, *args, **kwargs):
         super(ExpenseForm, self).__init__(*args, **kwargs)
-        categories = Category.query.filter_by(user_id=current_user.id).all()
-        print("Categories:", categories)  # Debugging line
-        self.category.choices = [(c.id, c.name) for c in categories]
+        # Load all categories for the dropdown without filtering by user_id
+        self.category.choices = [(c.id, c.name) for c in Category.query.all()]
+
+
 
 class EditExpenseForm(FlaskForm):
     amount = FloatField('Amount', validators=[DataRequired()])
@@ -65,3 +66,14 @@ class UpdateProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=100)])
     submit = SubmitField('Update Profile')
+
+    def validate_email(self, email):
+        if email.data != current_user.email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('That email is already in use. Please choose a different one.')
+
+class CategoryForm(FlaskForm):
+    name = StringField('Category Name', validators=[DataRequired()])
+    submit = SubmitField('Add Category')
+
